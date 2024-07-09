@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="author" content="Untree.co">
+    <link rel="shortcut icon" href="favicon.png">
+
+    <!-- Bootstrap CSS -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="{% static 'css/tiny-slider.css' %}" rel="stylesheet">
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    <title>Staff</title> 
+    
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <style>
+
+        .custom-navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+        
+        /* Add margin to body content to avoid overlapping with fixed navigation */
+        body {
+            padding-top: 80px; /* Adjust as per your navigation bar height */
+        }
+
+
+        /* Style for the input field */
+        .comment-input {
+            width: 100%;
+        }
+        .user-info {
+            float: right;
+            margin-right: 20px; /* Adjust margin as needed */
+            line-height: 40px; /* Adjust line height for vertical alignment */
+        }
+
+        .user-info img {
+            width: 40px; /* Adjust size of the account icon */
+            height: 40px;
+            margin-right: 10px; /* Add some space between icon and username */
+        }
+        .square {
+            border-radius: 0; /* Set border-radius to 0 to make the button square */
+        }
+        .smaller{
+            padding: 0.25rem 0.5rem; /* Adjust padding to make the button smaller */
+            font-size: 0.75rem; /* Adjust font size to make the text smaller */
+        }
+        
+        
+    </style>
+    
+
+    
+</head>
+<body >
+
+    <!-- Start Header/Navigation -->
+    <nav class="custom-navbar navbar navbar-expand-md navbar-dark bg-dark" arial-label="Furni navigation bar">
+        <div class="container">
+            <img src="{% static 'images/ncpb2.jpg'%}" alt="Logo" style="width: 50px; height: 50px; " class="rounded-circle" >
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsFurni" aria-controls="navbarsFurni" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarsFurni">
+                <ul class="custom-navbar-nav navbar-nav ms-auto mb-2 mb-md-0">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="index.html">Home</a>
+                    </li>
+                    <li><a class="nav-link" href="shop.html">Shop</a></li>
+                    <li><a class="nav-link" href="about.html">About us</a></li>
+                    <li><a class="nav-link" href="services.html">Services</a></li>
+                    <li><a class="nav-link" href="blog.html">Blog</a></li>
+                    <li><a class="nav-link" href="{% url 'contact' %}">Contacts</a></li>
+                </ul>
+
+                <a href="{% url 'login_view' %}">
+                    <button type="button" class="btn btn-white-outline btn-rounded">Login</button>
+                </a>
+                
+            </div>
+            
+        </div>
+        <div class="user-info text-white">
+            <span>{{ user.username }}</span>
+            <img src="{% static 'images/profile.png' %}" alt="Account Icon">
+            
+        </div>
+    </nav>
+    <!-- End Header/Navigation -->
+    <div class="container mt-4">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Full Name</th>
+                        <th>ID Number</th>
+                        <th>Contact</th>
+                        <th>Nature of Visit</th>
+                        <th>Purpose</th>
+                        <th>Comments</th>
+                        <th>Sign Out</th>
+                        
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in entries %}
+                    <tr>
+                        <td>{{ entry.fname }}</td>
+                        <td>{{ entry.id_number }}</td>
+                        <td>{{ entry.contact }}</td>
+                        <td>{{ entry.nature_of_visit }}</td>
+                        <td>{{ entry.purpose }}</td>
+                        <td class="comment-cell">
+                            {% if entry.comments %}
+                            {{ entry.comments }}
+                            {% else %}
+                            <button type="button" class="btn btn-primary btn-sm square smaller" data-bs-toggle="modal" data-bs-target="#exampleModal" data-entry-id="{{ entry.id }}">Comment</button>
+
+                            {% endif %}
+                        </td>
+
+                        <td class="sign-out-cell d-flex justify-content-center">
+                            {% if entry.is_signedout is True %}
+                                <a href="/signedout/{{ entry.id }}?is_signedout=false"><img src="{% static 'images/tick.jpg' %}" class="sign-out-icon" style="width: 27px; height: 27px;" alt="Not Signed Out"> </a> 
+                            {% else %}
+                                <a href="/signedout/{{ entry.id }}?is_signedout=true"><img src="{% static 'images/cancel.png' %}" class="sign-out-icon" style="width: 17px; height: 17px;" alt="Signed Out"> </a>
+                                
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    
+
+    <div class="modal fade" id="exampleModal" aria-hidden="true" data-entry-id="">
+        <div class="modal-dialog">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Leave a comment</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="commentForm">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <input type="text" class="form-control" placeholder="Type Comment..." id="commentInput">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="saveCommentBtn">Save</button>
+            </div>
+        </div>
+    </div>
+    
+    
+
+    <form action="{% url 'logout' %}" method="post">
+        {% csrf_token %}
+        <button type="submit">Logout</button>
+    </form>
+
+    <script src="{% static 'js/bootstrap.bundle.min.js'%}"></script>
+    <script src="{% static 'js/tiny-slider.js'%}"></script>
+    <script src="{% static 'js/custom.js'%}"></script>
+
+    <script>
+        $(document).ready(function() {
+            $('.btn.btn-primary.btn-sm').on('click', function() {
+                var entryId = $(this).data('entry-id');
+                $('#exampleModal').data('entry-id', entryId);  // Store the entry ID in the modal dialog
+            });
+        
+            $('#saveCommentBtn').on('click', function() {
+                var comment = $('#commentInput').val();
+                var entryId = $('#exampleModal').data('entry-id');  // Retrieve the entry ID from the modal dialog
+        
+                // Check if entryId is not empty
+                if (entryId) {
+                    $.ajax({
+                        url: '/save_comment/' + entryId + '/',  // Construct the URL with the entry ID
+                        method: 'POST',
+                        data: {
+                            'comment': comment,
+                            'csrfmiddlewaretoken': '{{ csrf_token }}'
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                $('#exampleModal').modal('hide');  // Close the modal after saving
+                                $('td.comment-cell[data-entry-id="' + entryId + '"]').html(response.comment);  // Update the comment cell with the saved comment
+                                location.reload(true); // Reload the page
+                            } else {
+                                console.error('Error saving comment:', response.error);
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error saving comment:', error);
+                        }
+                    });
+                } else {
+                    console.error('Entry ID is empty');
+                }
+            });
+        });
+        
+    </script>
+
+    
+
+</body>
+</html>

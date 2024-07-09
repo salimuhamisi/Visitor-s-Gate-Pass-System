@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>WebVR Example</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <style>
+        #container {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+        }
+        a-scene {
+            height: 100%;
+        }
+    </style>
+    location.reload(true); // Reload the page
+</head>
+<body>
+    <div id="container">
+        <a-scene>
+            <a-sky color="#6EBAA7"></a-sky>
+            <a-box position="-1 0.5 -3" rotation="0 45 0" color="#4CC3D9"></a-box>
+            <a-sphere position="0 1.25 -5" radius="1.25" color="#EF2D5E"></a-sphere>
+            <a-cylinder position="1 0.75 -3" radius="0.5" height="1.5" color="#FFC65D"></a-cylinder>
+            <a-plane position="0 0 -4" rotation="-90 0 0" width="4" height="4" color="#7BC8A4"></a-plane>
+        </a-scene>
+    </div>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="container mt-4">
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Full Name</th>
+                    <th>Contact</th>
+                    <th>Nature of Visit</th>
+                    <th>Purpose</th>
+                    <th>Comments</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in entries %}
+                    <tr>
+                        <td>{{ entry.fname }}</td>
+                        <td>{{ entry.contact }}</td>
+                        <td>{{ entry.nature_of_visit }}</td>
+                        <td>{{ entry.purpose }}</td>
+                        <td class="comment-cell">
+                            {% if entry.comments %}
+                                {{ entry.comments }}
+                            {% else %}
+                                <span class="add-comment"><a href="{% url 'update_comment' entry.id %}">Add Comment</a></span>
+                            {% endif %}
+                        </td>
+                        <td class="entry-id" style="display: none;">{{ entry.id }}</td>
+                        <td><a href="#">SignOut</a></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+
+
+// Entry ID is .empty
+
+<script>
+    $(document).ready(function() {
+        $('.enter-comment').on('click', function() {
+            var entryId = $(this).data('entry-id');
+            $('#exampleModal').data('entry-id', entryId);  // Store the entry ID in the modal dialog
+        });
+
+        $('#saveCommentBtn').on('click', function() {
+            var comment = $('#commentInput').val();
+            var entryId = $('#exampleModal').data('entry-id');  // Retrieve the entry ID from the modal dialog
+
+            // Check if entryId is not empty
+            if (entryId) {
+                $.ajax({
+                    url: '/save_comment/' + entryId + '/',  // Construct the URL with the entry ID
+                    method: 'POST',
+                    data: {
+                        'comment': comment,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            $('#exampleModal').modal('hide');  // Close the modal after saving
+                            $('td.comment-cell[data-entry-id="' + entryId + '"]').html(response.comment);  // Update the comment cell with the saved comment
+                        } else {
+                            console.error('Error saving comment:', response.error);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error saving comment:', error);
+                    }
+                });
+            } else {
+                console.error('Entry ID is empty');
+            }
+        });
+    });
+
+
+</script>
+
+
+
+
+
+$(document).ready(function() {
+    $('.sign-out').on('click', function() {
+        var entryId = $(this).closest('tr').find('.entry-id').text().trim();
+        var signOutStatus = !$(this).closest('tr').find('.sign-out-cell img').hasClass('signed-out');
+
+        $.ajax({
+            url: '/update_sign_out_status/' + entryId + '/',
+            method: 'POST',
+            data: {
+                'signed_out': signOutStatus ? 'true' : 'false',
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(response) {
+                if (response.success) {
+                    if (signOutStatus) {
+                        $(this).closest('tr').find('.sign-out-cell img').attr('src', '{% static "images/tick.jpg" %}');
+                        $(this).closest('tr').find('.sign-out-cell img').addClass('signed-out');
+                    } else {
+                        $(this).closest('tr').find('.sign-out-cell img').attr('src', '{% static "images/cancel.png" %}');
+                        $(this).closest('tr').find('.sign-out-cell img').removeClass('signed-out');
+                    }
+                } else {
+                    console.error('Error updating sign-out status:', response.error);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Error updating sign-out status:', error);
+            }
+        });
+    });
+});
+
+
+<td class="release-cell d-flex justify-content-center">
+    {% if entry.is_released is True %}
+        <a href="/release/{{ entry.id }}?is_released=false"><img src="{% static 'images/cancel.png' %}" class="sign-out-icon" style="width: 17px; height: 17px;" alt="Signed Out"> </a>
+    {% else %}
+        <a href="/release/{{ entry.id }}?is_release=true"><img src="{% static 'images/tick.jpg' %}" class="sign-out-icon" style="width: 27px; height: 27px;" alt="Not Signed Out"> </a>
+    {% endif %}
+</td>
+
+
+
+
+
+
+
+
+
+<td>{{ entry.purpose }}</td>
+
+<td class="release-cell d-flex justify-content-center">
+    {% if entry.is_released %}
+        <a href="{% url 'released' entry.id %}?is_released=false">
+            <img src="{% static 'images/tick.jpg' %}" class="release-icon" style="width: 25px; height: 25px;" alt="Signed Out">
+        </a>
+    {% else %}
+        
+        <a href="{% url 'released' entry.id %}?is_released=true">
+            <img src="{% static 'images/cancel.png' %}" class="release-icon" style="width: 17px; height: 17px;" alt="Not Signed Out">
+        </a>
+    {% endif %}
+</td>
+
+
+
+<script>
+    $(document).ready(function() {
+        // Handle click event for release icons
+        $('.release-icon').on('click', function(e) {
+            e.preventDefault();
+            var entryId = $(this).closest('tr').find('.entry-id').text().trim();
+            var isReleased = $(this).attr('src').includes('cancel.png');
+
+            // Toggle the image src attribute based on the current release status
+            if (isReleased) {
+                $(this).attr('src', '{% static "images/tick.jpg" %}');
+            } else {
+                $(this).attr('src', '{% static "images/cancel.png" %}');
+            }
+
+            // Send AJAX request to update the release status
+            $.ajax({
+                type: 'GET',
+                url: '/released/' + entryId + '/?is_released=' + !isReleased,
+                success: function(response) {
+                    // Optionally handle success response
+                },
+                error: function(xhr, errmsg, err) {
+                    console.log('Error occurred:', errmsg);
+                }
+            });
+        });
+    });
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@login_required
+def update_comment(request, entry_id):
+    entry = get_object_or_404(Entry, pk=entry_id)
+    if request.method == 'POST':
+        form = CommentUpdateForm(request.POST, instance=entry)
+        if form.is_valid():
+            form.save()
+            return redirect('staff_page')  # Redirect to the staff page after comment update
+    else:
+        form = CommentUpdateForm(instance=entry)
+    return render(request, 'update.html', {'form': form})

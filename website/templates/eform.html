@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="author" content="Untree.co">
+    <link rel="shortcut icon" href="favicon.png">
+
+    <!-- Bootstrap CSS -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="{% static 'css/tiny-slider.css' %}" rel="stylesheet">
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    <title>form</title> 
+    
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <style>
+        
+        .user-info {
+            float: right;
+            margin-right: 20px; /* Adjust margin as needed */
+            line-height: 40px; /* Adjust line height for vertical alignment */
+        }
+
+        .user-info img {
+            width: 40px; /* Adjust size of the account icon */
+            height: 40px;
+            margin-right: 10px; /* Add some space between icon and username */
+        }
+    
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+    
+        
+    
+        .btn-primary {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 40px;
+        }
+    
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+    
+        /* Style select dropdown to match other input fields */
+        select.form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 7px;
+            background-color: #fff;
+            color: #495057;
+            height: auto; /* Ensures consistent height across browsers */
+        }
+    
+        .bg-color {
+        background-color: #D6EAF8;/* Light yellow color */
+        border-radius: 20px;
+        padding-top: 20px;/* Adjusted padding top */
+        max-width: 800px; /* Adjust the max-width as needed */
+        margin: 0 auto; /* Center the form horizontally */
+        height: 450px;
+        }
+    
+        .btn-secondary {
+        border-radius: 4px; 
+        padding: 6px 16px; 
+        margin-right: 50px;
+    
+        }
+
+        /* Style the toggle switch */
+        .toggle {
+        position: relative;
+        display: inline-block;
+        width: 45px; /* Adjust width as needed */
+        height: 20px; /* Adjust height as needed */
+        }
+
+        /* Hide default HTML checkbox */
+        .toggle input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+        }
+
+        /* The slider */
+        .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        border-radius: 10px; /* Half of the height for a round circle */
+        transition: .4s;
+        }
+
+        /* On state */
+        .slider:before {
+        position: absolute;
+        content: "";
+        height: 16px; /* Adjust size of circle */
+        width: 16px; /* Adjust size of circle */
+        left: 2px; /* Adjust position of circle */
+        bottom: 2px; /* Adjust position of circle */
+        background-color: white;
+        border-radius: 50%; /* Make circle round */
+        transition: .4s;
+        }
+
+        /* Checked (On) state */
+        input:checked + .slider {
+        background-color: #2196F3;
+        }
+
+        input:checked + .slider:before {
+        transform: translateX(20px); /* Move circle to the right */
+        }
+        .person {
+        margin-bottom: 10px;
+        }
+        .custom-btn {
+            padding: 5px 10px; /* Adjust padding to make it smaller */
+            border-radius: 0; /* Remove border radius to make it square */
+        }
+
+    </style>
+    
+</head>
+<body >
+
+
+    <!-- Start Header/Navigation -->
+    <nav class="custom-navbar navbar navbar-expand-md navbar-dark bg-dark" arial-label="Furni navigation bar">
+        <div class="container">
+            <img src="{% static 'images/ncpb2.jpg'%}" alt="Logo" style="width: 50px; height: 50px; " class="rounded-circle" >
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsFurni" aria-controls="navbarsFurni" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarsFurni">
+                <ul class="custom-navbar-nav navbar-nav ms-auto mb-2 mb-md-0">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="{% url 'index' %}">Home</a>
+                    </li>
+                    <li><a href="{% url 'list' %}" class="nav-link" href="shop.html">Shop</a></li>
+                    <li><a class="nav-link" href="{% url 'grouplist' %}">Group Visitors</a></li>
+                    <li><a class="nav-link" href="services.html">Services</a></li>
+                    <li><a class="nav-link" href="blog.html">Blog</a></li>
+                    <li><a class="nav-link" href="{% url 'contact' %}">Contacts</a></li>
+                </ul>
+                
+            </div>
+
+            <div class="user-info text-white">
+                <span>{{ user.username }}</span>
+                <img src="{% static 'images/profile.png' %}" alt="Account Icon">
+                
+            </div>
+            
+        </div>
+        
+    </nav>
+
+    <!-- Start Header/Navigation -->
+
+    {% for msg in messages %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <strong>Holy guacamole!</strong> {{msg}}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+
+<!-- To add a Single Visitor -->
+    <div class="container mt-4" id="singlePersonForm">
+        <div class="row justify-content-center">
+            <div class="col-lg-10"> <!-- Adjust the column size based on your preference -->
+                <div class="card">
+                    <div class="card-header">
+                        <label class="toggle">
+                            <input type="checkbox" onchange="toggleForms()">
+                            <span class="slider"></span>
+                        </label>
+                        <span class="off-text" id="offText">One Person</span>
+                     
+                    </div>
+                    <div class="card-body">
+                        <form method="post" action="" id="myForm">
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="col-md-6 mb-5">
+                                    <input type="text" class="form-control" placeholder="ID Number" id="idNo" name="idNo" required>
+                                </div>
+                                <div class="col-md-6 mb-5">
+                                    <select class="form-control" id="nature_of_visit" name="nature_of_visit" required>
+                                        <option value="" selected disabled>Nature Of Visit...</option>
+                                        <option value="official">Official</option>
+                                        <option value="private">Private</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-5">
+                                    <input type="text" class="form-control" placeholder="Full Name" id="fname" name="fname" required>
+                                </div>
+                                <div class="col-md-6 mb-5">
+                                    <select class="form-control" id="destination" name="destination" required>
+                                        <option value="" selected disabled>Select Destination...</option>
+                                        <option value="ICT">ICT Department</option>
+                                        <option value="HR">Human Resource</option>
+                                        <option value="procurement">Procurement Department</option>
+                                        <option value="Legal">Legal Department</option>
+                                        <option value="Finance">Finance Department</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-5">
+                                    <input type="text" class="form-control" placeholder="Phone number" id="contact" name="contact" required>
+                                </div>
+                                <div class="col-md-6 mb-5">
+                                    <select class="form-control" id="visitee" name="visitee" required>
+                                        <option value="" selected disabled>Select Visitee...</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <input type="text" class="form-control" placeholder="Plate Number" id="plate_number" name="plate_number" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <input type="text" class="form-control" placeholder="Purpose of Visit" id="purpose" name="purpose" required>
+                                </div>
+                            </div>    
+                                
+                            <div class="form-group row">
+                                <div class="col-md-6">
+                                    <!-- Left align the button -->
+                                    <button type="submit" name="submit1" class="btn btn-primary">Submit</button>
+                                </div>
+                                <div class="col-md-6">
+                                    <!-- Clear form text link -->
+                                    <div class="float-end">
+                                        <a href="#" class="text-danger" onclick="clearForm()">Clear Form</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!-- The second Form, to add Group visitors -->
+    <div class="container mt-4 mb-4" id="groupForm" style="display: none;">
+        <div class="row justify-content-center">
+            <div class="col-lg-12"> <!-- Adjust the column size based on your preference -->
+                <div class="card">
+                    <div class="card-header">
+                        <label class="toggle">
+                            <input type="checkbox" onchange="toggleSinglePersonForm()">
+                            <span class="slider"></span>
+                        </label>
+                        <span class="off-text" id="offText" style="display:none">One Person</span>
+                        <span class="on-text" id="onText">Group</span>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" action="" id="myForm">
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <input type="text" class="form-control" placeholder="Group Name" name="group_name" required>
+                                </div>
+                                <div class="col-md-3">
+                                    <input type="text" class="form-control" placeholder="Purpose" name="purpose2" required>
+                                </div>
+                                <div class="col-md-2">
+                                    <input type="text" class="form-control" placeholder="Contacts" name="contact2" required>
+                                </div>
+                                <div class="col-md-2">
+                                    <input type="text" class="form-control" placeholder="Car Plate Number" name="plate_number2" required>
+                                </div>
+                                <div class="col-md-2">
+                                    <select class="form-control" id="destination" name="department" required>
+                                        <option value="" selected disabled>Department...</option>
+                                        <option value="ICT">ICT Department</option>
+                                        <option value="Human Resource">Human Resource</option>
+                                        <option value="procurement">Procurement Department</option>
+                                        <option value="Legal">Legal Department</option>
+                                        <option value="Finance">Finance Department</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="container mt-5">
+                                <div id="group">
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <input type="text" class="form-control" placeholder="Name" id="name2" name="name2[]" required>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <input type="number" class="form-control" placeholder="ID Number" id="id_number2" name="id_number2[]" required>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <button type="button" class="btn btn-primary custom-btn addMore"  >Add More</button>
+                                        </div>
+                                    </div> 
+                                </div>
+                            </div>
+                        
+                            <div class="form-group row mt-4">
+                                <div class="col-md-6">
+                                    <!-- Left align the button -->
+                                    <button type="submit" class="btn btn-primary" name="submit2">Submit</button>
+                                </div>
+                                <div class="col-md-6">
+                                    <!-- Clear form text link -->
+                                    <div class="float-end">
+                                        <a href="#" class="text-danger" onclick="clearForm()">Clear Form</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    
+
+    <script src="{% static 'js/bootstrap.bundle.min.js'%}"></script>
+    <script src="{% static 'js/tiny-slider.js'%}"></script>
+    <script src="{% static 'js/custom.js'%}"></script>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+    $(document).ready(function() {
+        $('#destination').change(function() {
+            var destination = $(this).val();
+            var region = '{{ request.user.region }}'; // Get current user's region
+
+            // Send AJAX request to fetch visitees based on destination and region
+            $.ajax({
+                type: 'GET',
+                url: '/get_visitees/',
+                data: {
+                    'destination': destination,
+                    'region': region
+                },
+                success: function(data) {
+                    // Clear previous options
+                    $('#visitee').empty();
+                    // Append new options
+                    $.each(data.visitees, function(key, value) {
+                        $('#visitee').append('<option value="' + key + '">' + value + '</option>');
+                    });
+                }
+            });
+        });
+    });
+    </script>
+
+    <script>
+        function toggleSinglePersonForm() {
+            var singlePersonForm = document.getElementById("singlePersonForm");
+            var groupForm = document.getElementById("groupForm");
+            
+            // Hide the group form and show the single person form
+            groupForm.style.display = "none";
+            singlePersonForm.style.display = "block";
+        }
+
+        function toggleForms() {
+            var singlePersonForm = document.getElementById("singlePersonForm");
+            var groupForm = document.getElementById("groupForm");
+            var checkbox = document.querySelector('.toggle input[type="checkbox"]');
+            
+            if (checkbox.checked) {
+                // If the switch is checked (Group), show the group form and hide the single person form
+                groupForm.style.display = "block";
+                singlePersonForm.style.display = "none";
+            } else {
+                // If the switch is unchecked (One Person), show the single person form and hide the group form
+                groupForm.style.display = "none";
+                singlePersonForm.style.display = "block";
+            }
+        }
+    </script>
+    
+    <script>
+        $(document).ready(function(){
+            $('.addMore').click(function(e){
+                e.preventDefault();
+                $('#group').prepend(`
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <input type="text" class="form-control" placeholder="Name" id="name2" name="name2[]" required>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <input type="number" class="form-control" placeholder="ID Number" id="id_number2" name="id_number2[]" required>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="button" class="btn btn-warning custom-btn remove" style >Delete</button>
+                        </div>
+                    </div> 
+                `)       
+            });
+            $(document).on('click', '.remove', function(e){
+                e.preventDefault();
+                let row_item = $(this).parent().parent();
+                $(row_item).remove();
+            });
+        });
+    </script>
+</body>
+</html>
